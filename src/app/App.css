@@ -13,7 +13,9 @@ main {
 
 .articles-container {
     width: 100%;
+    display: -ms-grid;
     display: grid;
+    -ms-grid-columns: repeat(2, 215px);
     grid-template-columns: repeat(2, 215px);
     grid-gap: 16px;
     justify-content: center;
