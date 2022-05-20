@@ -4,7 +4,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 // Create loadCommentsForArticleId here.
 export const loadCommentsForArticleId = createAsyncThunk(
   "comments/loadCommentsForArticleId",
-  async (id) => {
+  async id => {
     const response = await fetch(`api/articles/${id}/comments`);
     const json = await response.json();
     console.log(json);
@@ -15,10 +15,10 @@ export const loadCommentsForArticleId = createAsyncThunk(
 // Create postCommentForArticleId here.
 export const postCommentForArticleId = createAsyncThunk(
   "comments/postCommentForArticleId",
-  async (articleId, comment) => {
-    const requestBody = JSON.stringify(comment);
+  async ({ articleId, comment }) => {
+    const requestBody = JSON.stringify({ comment: comment });
     const response = await fetch(`api/articles/${articleId}/comments`, {
-      method: "POST",
+      method: 'POST',
       body: requestBody,
     });
     const json = await response.json();
@@ -32,16 +32,20 @@ export const commentsSlice = createSlice({
   name: "comments",
   initialState: {
     // Add initial state properties here.
-    byArticleId: [],
+    byArticleId: [
+      // 123: ['great article', 'disagree!']
+    ],
     isLoadingComments: false,
     failedToLoadComments: false,
+
     createCommentIsPending: false,
     failedToCreateComment: false,
   },
   // Add extraReducers here.
   extraReducers: (builder) => {
     builder
-      .addCase(loadCommentsForArticleId.pending, (state, action) => {
+      // loadCommentsForArticleId
+      .addCase(loadCommentsForArticleId.pending, (state) => {
         state.isLoadingComments = true;
         state.failedToLoadComments = false;
       })
@@ -50,10 +54,11 @@ export const commentsSlice = createSlice({
         state.failedToLoadComments = false;
         state.byArticleId[action.payload.articleId] = action.payload.comments;
       })
-      .addCase(loadCommentsForArticleId.rejected, (state, action) => {
+      .addCase(loadCommentsForArticleId.rejected, (state) => {
         state.isLoadingComments = false;
         state.failedToLoadComments = true;
       })
+      // postCommentForArticleId
       .addCase(postCommentForArticleId.pending, (state, action) => {
         state.createCommentIsPending = true;
         state.failedToCreateComment = false;
@@ -61,8 +66,7 @@ export const commentsSlice = createSlice({
       .addCase(postCommentForArticleId.fulfilled, (state, action) => {
         state.createCommentIsPending = false;
         state.failedToCreateComment = false;
-        // debug here #14
-        state.byArticleId.push(action.payload);
+        state.byArticleId[action.payload.articleId] = action.payload.comments;
       })
       .addCase(postCommentForArticleId.rejected, (state, action) => {
         state.createCommentIsPending = false;
