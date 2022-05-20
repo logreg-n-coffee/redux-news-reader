@@ -8,6 +8,7 @@ export default function CommentForm({ articleId }) {
   const [comment, setComment] = useState("");
 
   // Declare isCreatePending here.
+  const isCreatePending = useSelector(createCommentIsPending);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -28,7 +29,11 @@ export default function CommentForm({ articleId }) {
           onChange={(e) => setComment(e.currentTarget.value)}
           type="text"
         />
-        <button className="comment-button">Submit</button>
+        <button 
+          className="comment-button" 
+          disabled={isCreatePending}>
+            Submit
+        </button>
       </div>
     </form>
   );

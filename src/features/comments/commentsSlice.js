@@ -32,9 +32,9 @@ export const commentsSlice = createSlice({
   name: "comments",
   initialState: {
     // Add initial state properties here.
-    byArticleId: [
+    byArticleId: {
       // 123: ['great article', 'disagree!']
-    ],
+    },
     isLoadingComments: false,
     failedToLoadComments: false,
 
@@ -52,23 +52,27 @@ export const commentsSlice = createSlice({
       .addCase(loadCommentsForArticleId.fulfilled, (state, action) => {
         state.isLoadingComments = false;
         state.failedToLoadComments = false;
-        state.byArticleId[action.payload.articleId] = action.payload.comments;
+        state.byArticleId = {
+          [action.payload.articleId]: action.payload.comments,  
+          // key value pairs: action.payload.articleId is the key; action.payload.comments will be the value
+        };
+        console.log(state.byArticleId); // debug: print the 
       })
       .addCase(loadCommentsForArticleId.rejected, (state) => {
         state.isLoadingComments = false;
         state.failedToLoadComments = true;
       })
       // postCommentForArticleId
-      .addCase(postCommentForArticleId.pending, (state, action) => {
+      .addCase(postCommentForArticleId.pending, (state) => {
         state.createCommentIsPending = true;
         state.failedToCreateComment = false;
       })
       .addCase(postCommentForArticleId.fulfilled, (state, action) => {
         state.createCommentIsPending = false;
         state.failedToCreateComment = false;
-        state.byArticleId[action.payload.articleId] = action.payload.comments;
+        state.byArticleId[action.payload.articleId].push(action.payload);
       })
-      .addCase(postCommentForArticleId.rejected, (state, action) => {
+      .addCase(postCommentForArticleId.rejected, (state) => {
         state.createCommentIsPending = false;
         state.failedToCreateComment = true;
       });
